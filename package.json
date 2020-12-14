@@ -16,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aneuhold/SurveyGoogleAppScript.git"
+    "url": "git+https://github.com/aneuhold/ASUTeamFormingGoogleAppScript.git"
   },
   "author": "Anton G Neuhold Jr",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aneuhold/SurveyGoogleAppScript/issues"
+    "url": "https://github.com/aneuhold/ASUTeamFormingGoogleAppScript/issues"
   },
-  "homepage": "https://github.com/aneuhold/SurveyGoogleAppScript#readme"
+  "homepage": "https://github.com/aneuhold/ASUTeamFormingGoogleAppScript#readme"
 }
