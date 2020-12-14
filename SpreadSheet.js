@@ -3,6 +3,15 @@
  */
 const SpreadSheet = {
   /**
+   * Gets the Google Spreadsheet attached to this script.
+   *
+   * @returns {GoogleAppsScript.Spreadsheet.Spreadsheet} the Spreadsheet
+   */
+  get() {
+    return SpreadsheetApp.getActiveSpreadsheet();
+  },
+
+  /**
    * Gets the sheet where the students are.
    *
    * @returns {GoogleAppsScript.Spreadsheet.Sheet} the sheet labeled "Students"
