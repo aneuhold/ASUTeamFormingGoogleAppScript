@@ -1,0 +1,27 @@
+{
+  "name": "ASUGroupFormingGoogleAppScript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Main.js",
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.17"
+  },
+  "devDependencies": {
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aneuhold/SurveyGoogleAppScript.git"
+  },
+  "author": "Anton G Neuhold Jr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aneuhold/SurveyGoogleAppScript/issues"
+  },
+  "homepage": "https://github.com/aneuhold/SurveyGoogleAppScript#readme"
+}
