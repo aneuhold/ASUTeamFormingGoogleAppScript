@@ -47,6 +47,17 @@ const Config = {
     }
     configHelper.configObj[configKey] = newValue;
   },
+
+  /**
+   * Clears the "Config" sheet of set values.
+   */
+  clear() {
+    const configSheet = SpreadSheet.getConfigSheet();
+    const namedRanges = configSheet.getNamedRanges();
+    namedRanges.forEach((namedRange) => {
+      namedRange.getRange().clearContent();
+    });
+  },
 };
 
 /**

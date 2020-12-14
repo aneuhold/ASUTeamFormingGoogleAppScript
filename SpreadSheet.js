@@ -17,8 +17,16 @@ const SpreadSheet = {
    * @returns {GoogleAppsScript.Spreadsheet.Sheet} the sheet labeled "Students"
    */
   getStudentsSheet() {
-    const ss = SpreadsheetApp.getActive();
-    return ss.getSheetByName('Students'); // name of the sheet to read
+    return this.get().getSheetByName('Students');
+  },
+
+  /**
+   * Gets the "Config" sheet.
+   *
+   * @returns {GoogleAppsScript.Spreadsheet.Sheet} the sheet labeled "Config"
+   */
+  getConfigSheet() {
+    return this.get().getSheetByName('Config');
   },
 
   /**
