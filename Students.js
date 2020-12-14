@@ -3,7 +3,6 @@
  * @type {{
  *  fullName: string,
  *  asuId: string,
- *  teamName: string,
  * }}
  */
 

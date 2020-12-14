@@ -11,4 +11,3 @@ To develop for this project, `clasp` can be used to write code and push it to th
 - Add part of google sheet that will have the students and IDs
 - Survey generation
    - Make it so that the part that asks about choosing other students shows their asurite, followed by their full name in each option.
-- Make use of architecture where objects are exported from files with functions on them.
