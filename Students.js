@@ -13,10 +13,6 @@
  * }}
  */
 
-function testStudents() {
-  Logger.log(Students.getAll());
-}
-
 /**
  * Contains operations relating to the students in the course.
  */

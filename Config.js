@@ -15,6 +15,10 @@
  * @type {'formTitle' | 'formId'}
  */
 
+function testConfig() {
+  Logger.log(Config.getObj());
+}
+
 /**
  * Houses the methods and properties associated with the config for these
  * scripts.
@@ -75,6 +79,14 @@ const configHelper = {
    * information from the "Config" sheet to do that.
    */
   createConfigObj() {
-    throw new Error('createConfigObj not implemented');
+    const configSheet = SpreadSheet.getConfigSheet();
+    const namedRanges = configSheet.getNamedRanges();
+    this.configObj = {};
+
+    namedRanges.forEach((namedRange) => {
+      // For all other cases
+      const cellValue = namedRange.getRange().getValue();
+      this.configObj[namedRange.getName()] = cellValue;
+    });
   },
 };
