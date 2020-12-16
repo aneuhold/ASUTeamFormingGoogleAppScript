@@ -25,4 +25,22 @@ const Form = {
     Config.setValue('formId', newForm.getId());
     Logger.log('The formID range was set to the new form ID');
   },
+
+  /**
+   * Gets the form that should be used to update and collect data from once
+   * responses are submitted.
+   *
+   * @returns {GoogleAppsScript.Forms.Form | null} the form with the ID
+   * specified in the config or `null` if no form ID is specified in the config
+   */
+  get() {
+    const { formId } = Config.getObj();
+
+    if (formId === '' || formId === undefined) {
+      Logger.log('form ID must be specified to get the form');
+      return null;
+    }
+
+    return FormApp.openById(formId);
+  },
 };

@@ -8,10 +8,9 @@
  * each student.
  */
 function updateForm() {
-  const form = getForm();
-  form.setDescription('This form is to provide information about your team, '
-  + 'yourself and each individual in the team. It will only be read by the '
-  + 'instructor and grading team.');
+  const form = Form.get();
+  const { formDescription } = Config.getObj();
+  form.setDescription(formDescription);
 
   const studentsObj = Students.getAll();
 

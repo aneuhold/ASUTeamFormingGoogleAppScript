@@ -6,8 +6,12 @@ To develop for this project, `clasp` can be used to write code and push it to th
 
 ## Backlog
 
-- Add part of the config that will allow hour increments to be chosen
-- Add part of the config that allows starting day and ending day to be chosen for the weeks.
-- Add part of google sheet that will have the students and IDs
+- Config
+   - Setup a way for the proficiency questions to be pulled in
+   - Add part of the config that will allow hour increments to be chosen
+   - Add part of the config that allows starting day and ending day to be chosen for the weeks.
 - Survey generation
    - Make it so that the part that asks about choosing other students shows their asurite, followed by their full name in each option.
+   - Create a way to generate the times and dates automatically
+- Testing
+   - Setup a testing file that can be used to test submissions from various students
