@@ -23,7 +23,7 @@ const Form = {
     newForm.setDestination(FormApp.DestinationType.SPREADSHEET, spreadsheet.getId());
     Logger.log('The new destination for the form was set');
     Config.setValue('formId', newForm.getId());
-    Logger.log('The formID range was set to the new form ID');
+    Logger.log('The formId range was set to the new form ID');
   },
 
   /**
@@ -42,5 +42,74 @@ const Form = {
     }
 
     return FormApp.openById(formId);
+  },
+
+  /**
+   * Updates the form set in the config with the `formId` with the questions
+   * used to form teams.
+   */
+  updateForm() {
+    const form = Form.get();
+    const { formDescription } = Config.getObj();
+    form.setDescription(formDescription);
+
+    formHelper.addAsuriteQuestion(form);
+  },
+
+  /**
+   * Deletes the form attached to the spreadsheet for this script if there is
+   * one. It also unlinks, and removes the sheet associated with it.
+   */
+  delete() {
+    const form = this.get();
+    if (form === null) {
+      throw new Error('No form ID specified in the config');
+    }
+
+    // Unlink the form
+    form.removeDestination();
+
+    // Put the form in the trash
+    DriveApp.getFileById(form.getId()).setTrashed(true);
+
+    // Find the name of the sheet with the responses
+    const spreadsheet = SpreadSheet.get();
+    const sheets = spreadsheet.getSheets();
+    let responsesSheetName = '';
+    let i = 0;
+    while (responsesSheetName === '' && i < sheets.length) {
+      const currentSheetName = sheets[i].getName();
+      if (currentSheetName.includes('Form Responses')) {
+        responsesSheetName = currentSheetName;
+      }
+      i++;
+    }
+
+    // Remove the sheet with the name "Form Responses"
+    const responseSheet = spreadsheet.getSheetByName(responsesSheetName);
+    spreadsheet.deleteSheet(responseSheet);
+  },
+};
+
+/**
+ * Contains methods and properties that should only be accessed or used by
+ * functions within the `Form.js` file.
+ */
+const formHelper = {
+
+  /**
+   * Adds the ASURITE ID question to the form.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
+   */
+  addAsuriteQuestion(form) {
+    Logger.log('STarting to add the question');
+    const studentsObj = Students.getAll();
+    const listItem = form.addListItem()
+      .setTitle('Please select your ASURITE ID');
+    const choices = Object.values(studentsObj)
+      .map((studentObj) => studentObj.asuId);
+    listItem.setChoiceValues(choices);
+    Logger.log('adding the question is done');
   },
 };

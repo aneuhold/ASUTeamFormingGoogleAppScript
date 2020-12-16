@@ -49,6 +49,8 @@ const Config = {
    * Sets the value for the given config key. If the given config key exists
    * on the "Config" sheet, then that is updated too.
    *
+   * This only works for single cell configuration items.
+   *
    * @param {ConfigKey} configKey the config key name. For example `formId`.
    * @param {any} newValue the new value for the config item
    */
@@ -57,6 +59,9 @@ const Config = {
       configHelper.createConfigObj();
     }
     configHelper.configObj[configKey] = newValue;
+    const spreadsheet = SpreadSheet.get();
+    const configRange = spreadsheet.getRangeByName(configKey);
+    configRange.setValue(newValue);
   },
 
   /**
