@@ -37,6 +37,18 @@ const Students = {
     studentsHelper.studentsObj = studentsHelper.createStudentsObj();
     return studentsHelper.studentsObj;
   },
+
+  /**
+   * Gets the ASURITE IDs sorted alphabetically as an array.
+   *
+   * @returns {string[]} the sorted array of ASURITE IDs
+   */
+  getAsuriteIdsSorted() {
+    const studentsObj = this.getAll();
+    return Object.values(studentsObj)
+      .map((studentObj) => studentObj.asuId)
+      .sort();
+  },
 };
 
 /**

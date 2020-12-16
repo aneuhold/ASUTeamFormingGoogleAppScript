@@ -88,6 +88,9 @@ const Form = {
     // Remove the sheet with the name "Form Responses"
     const responseSheet = spreadsheet.getSheetByName(responsesSheetName);
     spreadsheet.deleteSheet(responseSheet);
+
+    // Remove the config value
+    Config.setValue('formId', '');
   },
 };
 
@@ -103,13 +106,10 @@ const formHelper = {
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addAsuriteQuestion(form) {
-    Logger.log('STarting to add the question');
-    const studentsObj = Students.getAll();
     const listItem = form.addListItem()
       .setTitle('Please select your ASURITE ID');
-    const choices = Object.values(studentsObj)
-      .map((studentObj) => studentObj.asuId);
-    listItem.setChoiceValues(choices);
-    Logger.log('adding the question is done');
+    const choices = Students.getAsuriteIdsSorted();
+    listItem.setChoiceValues(choices)
+      .setRequired(true);
   },
 };
