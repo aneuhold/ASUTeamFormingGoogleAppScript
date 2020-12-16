@@ -4,7 +4,11 @@
  * @typedef ConfigObj
  * @type {{
  *  formTitle: string,
- *  formId: string
+ *  formId: string,
+ *  formDescription: string,
+ *  numPreferredStudents: Number,
+ *  numDislikedStudents: Number,
+ *  proficiencyQuestions: string[]
  * }}
  */
 
@@ -12,11 +16,14 @@
  * Changes here should be reflected in the `ConfigObj` type.
  *
  * @typedef ConfigKey
- * @type {'formTitle' | 'formId'}
+ * @type {'formTitle' | 'formId' | 'formDescription'}
  */
 
+/**
+ * Simply tests the config object creation.
+ */
 function testConfig() {
-  Logger.log(Config.getObj());
+  Logger.log(JSON.stringify(Config.getObj(), null, 2));
 }
 
 /**
@@ -84,9 +91,35 @@ const configHelper = {
     this.configObj = {};
 
     namedRanges.forEach((namedRange) => {
-      // For all other cases
       const cellValue = namedRange.getRange().getValue();
-      this.configObj[namedRange.getName()] = cellValue;
+      const configKey = namedRange.getName();
+
+      if (configKey === 'numPreferredStudents'
+      || configKey === 'numDislikedStudents') {
+        const parsedValue = Number.parseInt(cellValue, 10);
+        this.configObj[configKey] = parsedValue;
+        return;
+      }
+
+      if (configKey === 'proficiencyQuestions') {
+        const questionsRange = namedRange.getRange();
+
+        // Loop through each cell and collect the ones that don't have nothing
+        const numRows = questionsRange.getHeight();
+        const questions = [];
+        for (let currentRow = 1; currentRow <= numRows; currentRow++) {
+          const currentCellValue = questionsRange.getCell(currentRow, 1)
+            .getValue();
+          if (currentCellValue !== '') {
+            questions.push(currentCellValue);
+          }
+        }
+        this.configObj[configKey] = questions;
+
+        return;
+      }
+
+      this.configObj[configKey] = cellValue;
     });
   },
 };
