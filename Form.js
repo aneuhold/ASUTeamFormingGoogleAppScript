@@ -57,7 +57,7 @@ const Form = {
     formHelper.addGithubUserNameQuestion(form);
     formHelper.addTaigaEmailAddressQuestion(form);
     formHelper.addTimeZonesQuestion(form);
-    // Add available times question
+    formHelper.addAvailabilityGrid(form);
     formHelper.addProficiencyQuestions(form);
     formHelper.addPreferredStudentsSection(form);
     formHelper.addDislikedStudentsSection(form);
@@ -226,5 +226,18 @@ const formHelper = {
         .setTitle(question)
         .setBounds(1, 5);
     });
+  },
+
+  /**
+   * Adds the availability grid to the form.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the questions to
+   */
+  addAvailabilityGrid(form) {
+    form.addCheckboxGridItem()
+      .setTitle('Please choose times that are good for your team to meet. '
+      + 'Times are in the Phoenix, AZ time zone!')
+      .setColumns(DateUtil.getWeekdayStrings())
+      .setRows(DateUtil.generateTimeStrings(3));
   },
 };
