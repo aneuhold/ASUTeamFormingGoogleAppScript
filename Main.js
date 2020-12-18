@@ -18,3 +18,7 @@ function createForm() {
 function deleteForm() {
   Form.delete();
 }
+
+function clearForm() {
+  Form.deleteAllItems();
+}

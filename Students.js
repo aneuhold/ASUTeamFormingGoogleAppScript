@@ -49,6 +49,24 @@ const Students = {
       .map((studentObj) => studentObj.asuId)
       .sort();
   },
+
+  /**
+   * Gets the set of strings for each student holding their asurite then their
+   * full name. For example: "aneuhold - Anton Neuhold".
+   *
+   * @returns {string[]} the set of asurite name combos for each student in the
+   * class sorted alphabetically
+   */
+  getAsuriteNameCombos() {
+    if (studentsHelper.asuriteNameComboStrings !== null) {
+      return studentsHelper.asuriteNameComboStrings;
+    }
+    const studentsObj = this.getAll();
+    studentsHelper.asuriteNameComboStrings = Object.values(studentsObj)
+      .map((studentObj) => `${studentObj.asuId} - ${studentObj.fullName}`)
+      .sort();
+    return studentsHelper.asuriteNameComboStrings;
+  },
 };
 
 /**
@@ -62,6 +80,14 @@ const studentsHelper = {
    * @type {StudentsObj | null}
    */
   studentsObj: null,
+
+  /**
+   * Holds the strings for each student which starts with their asurite, and
+   * ends with their full name. For example: "aneuhold - Anton Neuhold".
+   *
+   * @type {string[]}
+   */
+  asuriteNameComboStrings: null,
 
   /**
    * Creates a Students Object by pulling information from the "Students" sheet.
@@ -98,4 +124,5 @@ const studentsHelper = {
     this.studentsObj = studentsObj;
     return this.studentsObj;
   },
+
 };

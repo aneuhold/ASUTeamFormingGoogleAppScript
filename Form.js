@@ -30,15 +30,15 @@ const Form = {
    * Gets the form that should be used to update and collect data from once
    * responses are submitted.
    *
-   * @returns {GoogleAppsScript.Forms.Form | null} the form with the ID
-   * specified in the config or `null` if no form ID is specified in the config
+   * @returns {GoogleAppsScript.Forms.Form} the form with the ID
+   * specified in the config
+   * @throws {Error} if no form ID is specified in the config
    */
   get() {
     const { formId } = Config.getObj();
 
     if (formId === '' || formId === undefined) {
-      Logger.log('form ID must be specified to get the form');
-      return null;
+      throw new Error('No form ID specified in the config');
     }
 
     return FormApp.openById(formId);
@@ -49,11 +49,14 @@ const Form = {
    * used to form teams.
    */
   updateForm() {
-    const form = Form.get();
+    const form = this.get();
     const { formDescription } = Config.getObj();
     form.setDescription(formDescription);
 
     formHelper.addAsuriteQuestion(form);
+    formHelper.addGithubUserNameQuestion(form);
+    formHelper.addTaigaEmailAddressQuestion(form);
+    formHelper.addPreferredStudentsSection(form);
   },
 
   /**
@@ -62,9 +65,6 @@ const Form = {
    */
   delete() {
     const form = this.get();
-    if (form === null) {
-      throw new Error('No form ID specified in the config');
-    }
 
     // Unlink the form
     form.removeDestination();
@@ -91,6 +91,18 @@ const Form = {
 
     // Remove the config value
     Config.setValue('formId', '');
+  },
+
+  /**
+   * Deletes all items (questions and sections) on the form.
+   */
+  deleteAllItems() {
+    const form = this.get();
+    const formItems = form.getItems();
+    // Doing in reverse because the index shrinks as things are deleted.
+    for (let i = formItems.length - 1; i >= 0; i--) {
+      form.deleteItem(i);
+    }
   },
 };
 
@@ -132,4 +144,26 @@ const formHelper = {
     form.addTextItem().setTitle('Email address for us to invite you to the '
     + 'Taiga scrumboard');
   },
+
+  /**
+   * Adds the preferred students section which will populate with the number
+   * of preferred students allowed as specified in the config.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
+   */
+  addPreferredStudentsSection(form) {
+    form.addSectionHeaderItem().setTitle('Preferred Teammates')
+      .setHelpText('Are there fellow students you would prefer to work'
+      + ' with?');
+
+    // Build the options for each one
+    const { numPreferredStudents } = Config.getObj();
+    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
+    for (let i = 0; i < numPreferredStudents; i++) {
+      form.addListItem()
+        .setTitle(`Preferred team member ${i}`)
+        .setChoiceValues(asuriteNameComboStrings);
+    }
+  },
+
 };
