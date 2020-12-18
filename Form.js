@@ -112,4 +112,24 @@ const formHelper = {
     listItem.setChoiceValues(choices)
       .setRequired(true);
   },
+
+  /**
+   * Adds the Github username question to the form.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
+   */
+  addGithubUserNameQuestion(form) {
+    form.addTextItem().setTitle('Please enter your Github username (NOT '
+    + 'your email address)');
+  },
+
+  /**
+   * Adds the Taiga email question to the form.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
+   */
+  addTaigaEmailAddressQuestion(form) {
+    form.addTextItem().setTitle('Email address for us to invite you to the '
+    + 'Taiga scrumboard');
+  },
 };

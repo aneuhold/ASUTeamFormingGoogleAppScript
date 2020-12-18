@@ -14,3 +14,4 @@ To develop for this project, `clasp` can be used to write code and push it to th
    - Create a way to generate the times and dates automatically
 - Testing
    - Setup a testing file that can be used to test submissions from various students
+   - [x] Setup a way to delete the attached form and unlink from the spreadsheet
