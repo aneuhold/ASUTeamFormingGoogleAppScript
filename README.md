@@ -6,12 +6,12 @@ To develop for this project, `clasp` can be used to write code and push it to th
 
 ## Backlog
 
+- Testing
+   - [ ] Setup a testing file that can be used to test submissions from various students
+   - [x] Setup a way to delete the attached form and unlink from the spreadsheet
 - Config
    - Add part of the config that will allow hour increments to be chosen
    - Add part of the config that allows starting day and ending day to be chosen for the weeks.
 - Form generation
-   - Make it so that the part that asks about choosing other students shows their asurite, followed by their full name in each option.
-   - Create a way to generate the times and dates automatically
-- Testing
-   - Setup a testing file that can be used to test submissions from various students
-   - [x] Setup a way to delete the attached form and unlink from the spreadsheet
+   - [x] Make it so that the part that asks about choosing other students shows their asurite, followed by their full name in each option.
+   - [x] Create a way to generate the times and dates automatically
