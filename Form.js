@@ -132,7 +132,8 @@ const formHelper = {
    */
   addGithubUserNameQuestion(form) {
     form.addTextItem().setTitle('Please enter your Github username (NOT '
-    + 'your email address)');
+    + 'your email address)')
+      .setRequired(true);
   },
 
   /**
@@ -142,7 +143,8 @@ const formHelper = {
    */
   addTaigaEmailAddressQuestion(form) {
     form.addTextItem().setTitle('Email address for us to invite you to the '
-    + 'Taiga scrumboard');
+    + 'Taiga scrumboard')
+      .setRequired(true);
   },
 
   /**
@@ -152,7 +154,7 @@ const formHelper = {
    * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
    */
   addPreferredStudentsSection(form) {
-    form.addSectionHeaderItem().setTitle('Preferred Teammates')
+    form.addPageBreakItem().setTitle('Preferred Teammates')
       .setHelpText('Are there fellow students you would prefer to work'
       + ' with?');
 
@@ -161,7 +163,7 @@ const formHelper = {
     const asuriteNameComboStrings = Students.getAsuriteNameCombos();
     for (let i = 0; i < numPreferredStudents; i++) {
       form.addListItem()
-        .setTitle(`Preferred team member ${i}`)
+        .setTitle(`Preferred team member ${i + 1}`)
         .setChoiceValues(asuriteNameComboStrings);
     }
   },
