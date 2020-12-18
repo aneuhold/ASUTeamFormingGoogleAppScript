@@ -56,6 +56,7 @@ const Form = {
     formHelper.addAsuriteQuestion(form);
     formHelper.addGithubUserNameQuestion(form);
     formHelper.addTaigaEmailAddressQuestion(form);
+    formHelper.addTimeZonesQuestion(form);
     formHelper.addPreferredStudentsSection(form);
     formHelper.addDislikedStudentsSection(form);
   },
@@ -190,4 +191,24 @@ const formHelper = {
     }
   },
 
+  /**
+   * Adds the time zone question to the form.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
+   */
+  addTimeZonesQuestion(form) {
+    const listItem = form.addListItem()
+      .setTitle('In what time zone do you live or will you be during the'
+      + ' session? Please use UTC so we can match it easier.');
+
+    const choices = [];
+
+    // Generate UTC timezones choices
+    for (let i = -11; i <= 12; i++) {
+      choices.push(`UTC ${i < 0 ? '' : '+'}${i}`);
+    }
+
+    listItem.setChoiceValues(choices)
+      .setRequired(true);
+  },
 };
