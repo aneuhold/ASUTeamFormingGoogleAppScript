@@ -146,9 +146,17 @@ const formHelper = {
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addTaigaEmailAddressQuestion(form) {
-    form.addTextItem().setTitle('Email address for us to invite you to the '
-    + 'Taiga scrumboard')
+    const textItem = form.addTextItem()
+      .setTitle('Email address for us to invite you to the '
+      + 'Taiga scrumboard')
       .setRequired(true);
+
+    const emailValidation = FormApp.createTextValidation()
+      .setHelpText('Text entered was not a valid email address')
+      .requireTextIsEmail()
+      .build();
+
+    textItem.setValidation(emailValidation);
   },
 
   /**
