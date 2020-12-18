@@ -57,6 +57,7 @@ const Form = {
     formHelper.addGithubUserNameQuestion(form);
     formHelper.addTaigaEmailAddressQuestion(form);
     formHelper.addPreferredStudentsSection(form);
+    formHelper.addDislikedStudentsSection(form);
   },
 
   /**
@@ -164,6 +165,27 @@ const formHelper = {
     for (let i = 0; i < numPreferredStudents; i++) {
       form.addListItem()
         .setTitle(`Preferred team member ${i + 1}`)
+        .setChoiceValues(asuriteNameComboStrings);
+    }
+  },
+
+  /**
+   * Adds the disliked students section which will populate with the number
+   * of disliked students allowed as specified in the config.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
+   */
+  addDislikedStudentsSection(form) {
+    form.addPageBreakItem().setTitle('Teammates NOT Preferred')
+      .setHelpText('Are there fellow students you would prefer NOT to work'
+      + ' with?');
+
+    // Build the options for each one
+    const { numDislikedStudents } = Config.getObj();
+    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
+    for (let i = 0; i < numDislikedStudents; i++) {
+      form.addListItem()
+        .setTitle(`Non-preferred student ${i + 1}`)
         .setChoiceValues(asuriteNameComboStrings);
     }
   },
