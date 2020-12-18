@@ -57,6 +57,8 @@ const Form = {
     formHelper.addGithubUserNameQuestion(form);
     formHelper.addTaigaEmailAddressQuestion(form);
     formHelper.addTimeZonesQuestion(form);
+    // Add available times question
+    formHelper.addProficiencyQuestions(form);
     formHelper.addPreferredStudentsSection(form);
     formHelper.addDislikedStudentsSection(form);
   },
@@ -194,7 +196,7 @@ const formHelper = {
   /**
    * Adds the time zone question to the form.
    *
-   * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addTimeZonesQuestion(form) {
     const listItem = form.addListItem()
@@ -210,5 +212,19 @@ const formHelper = {
 
     listItem.setChoiceValues(choices)
       .setRequired(true);
+  },
+
+  /**
+   * Adds the proficiency questions to the form as specified in the config.
+   *
+   * @param {GoogleAppsScript.Forms.Form} form the form to add the questions to
+   */
+  addProficiencyQuestions(form) {
+    const { proficiencyQuestions } = Config.getObj();
+    proficiencyQuestions.forEach((question) => {
+      form.addScaleItem()
+        .setTitle(question)
+        .setBounds(1, 5);
+    });
   },
 };
