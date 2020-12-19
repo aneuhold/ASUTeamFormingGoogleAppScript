@@ -223,6 +223,13 @@ const Form = {
     const itemIds = SpreadSheet.getFormItemIdWithName(itemName);
     return itemIds.map((itemId) => form.getItemById(itemId));
   },
+
+  /**
+   * Permanently clears all responses from the form.
+   */
+  permanentlyClearResponses() {
+    this.get().deleteAllResponses();
+  },
 };
 
 /**

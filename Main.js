@@ -26,3 +26,7 @@ function clearForm() {
 function addTestResponses() {
   Test.submitTestResponsesForStudent('aneuhold');
 }
+
+function permanentlyClearResponses() {
+  Form.permanentlyClearResponses();
+}
