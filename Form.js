@@ -1,4 +1,20 @@
 /**
+ * The variable names of the items put on the survey. These are used to
+ * store their ID in a hidden sheet.
+ *
+ * @typedef FormItemName
+ * @type { 'asuriteQuestion' |
+ *  'githubUsername' |
+ *  'taigaEmail' |
+ *  'timeZone' |
+ *  'preferredStudents' |
+ *  'dislikedStudents' |
+ *  'availability' |
+ *  'proficiencyQuestions'
+ * }
+ */
+
+/**
  * Holds the methods and properties pertaining to the Google Form that is, or
  * could be, attached to the Google Sheet for this script.
  */
@@ -127,6 +143,8 @@ const formHelper = {
     const choices = Students.getAsuriteIdsSorted();
     listItem.setChoiceValues(choices)
       .setRequired(true);
+
+    SpreadSheet.addFormItemId('asuriteQuestion', listItem.getId());
   },
 
   /**
@@ -135,9 +153,12 @@ const formHelper = {
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addGithubUserNameQuestion(form) {
-    form.addTextItem().setTitle('Please enter your Github username (NOT '
-    + 'your email address)')
+    const textItem = form.addTextItem()
+      .setTitle('Please enter your Github username (NOT '
+      + 'your email address)')
       .setRequired(true);
+
+    SpreadSheet.addFormItemId('githubUsername', textItem.getId());
   },
 
   /**
@@ -157,6 +178,7 @@ const formHelper = {
       .build();
 
     textItem.setValidation(emailValidation);
+    SpreadSheet.addFormItemId('taigaEmail', textItem.getId());
   },
 
   /**
@@ -172,12 +194,15 @@ const formHelper = {
 
     // Build the options for each one
     const { numPreferredStudents } = Config.getObj();
+    const preferredStudentItemIds = [];
     const asuriteNameComboStrings = Students.getAsuriteNameCombos();
     for (let i = 0; i < numPreferredStudents; i++) {
-      form.addListItem()
+      const listItem = form.addListItem()
         .setTitle(`Preferred team member ${i + 1}`)
         .setChoiceValues(asuriteNameComboStrings);
+      preferredStudentItemIds.push(listItem.getId());
     }
+    SpreadSheet.addFormItemId('preferredStudents', preferredStudentItemIds.join(';'));
   },
 
   /**
@@ -193,12 +218,15 @@ const formHelper = {
 
     // Build the options for each one
     const { numDislikedStudents } = Config.getObj();
+    const dislikedStudentItemIds = [];
     const asuriteNameComboStrings = Students.getAsuriteNameCombos();
     for (let i = 0; i < numDislikedStudents; i++) {
-      form.addListItem()
+      const listItem = form.addListItem()
         .setTitle(`Non-preferred student ${i + 1}`)
         .setChoiceValues(asuriteNameComboStrings);
+      dislikedStudentItemIds.push(listItem.getId());
     }
+    SpreadSheet.addFormItemId('dislikedStudents', dislikedStudentItemIds.join(';'));
   },
 
   /**
@@ -220,6 +248,7 @@ const formHelper = {
 
     listItem.setChoiceValues(choices)
       .setRequired(true);
+    SpreadSheet.addFormItemId('timeZone', listItem.getId());
   },
 
   /**
@@ -229,11 +258,14 @@ const formHelper = {
    */
   addProficiencyQuestions(form) {
     const { proficiencyQuestions } = Config.getObj();
+    const proficiencyItemIds = [];
     proficiencyQuestions.forEach((question) => {
-      form.addScaleItem()
+      const scaleItem = form.addScaleItem()
         .setTitle(question)
         .setBounds(1, 5);
+      proficiencyItemIds.push(scaleItem.getId());
     });
+    SpreadSheet.addFormItemId('proficiencyQuestions', proficiencyItemIds.join(';'));
   },
 
   /**
@@ -242,10 +274,11 @@ const formHelper = {
    * @param {GoogleAppsScript.Forms.Form} form the form to add the questions to
    */
   addAvailabilityGrid(form) {
-    form.addCheckboxGridItem()
+    const checkboxItem = form.addCheckboxGridItem()
       .setTitle('Please choose times that are good for your team to meet. '
       + 'Times are in the Phoenix, AZ time zone!')
       .setColumns(DateUtil.getWeekdayStrings())
       .setRows(DateUtil.generateTimeStrings(3));
+    SpreadSheet.addFormItemId('availability', checkboxItem.getId());
   },
 };
