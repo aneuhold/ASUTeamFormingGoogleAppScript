@@ -55,17 +55,23 @@ const SpreadSheet = {
   },
 
   /**
-   * Gets the item ID associated with an item name for a form. This information
-   * is held in a hidden sheet called "*formItemIds". The item ID can be used
-   * to retrieve an item from the form attached to the spreadsheet.
+   * Gets the item ID/s associated with an item name for a form. This
+   * information is held in a hidden sheet called "*formItemIds". The item ID
+   * can be used to retrieve an item from the form attached to the spreadsheet.
    *
-   * @param {FormItemName} itemName the name of the item to retrieve.
-   * @returns {string} the ID of the item with the given itemName
+   * @param {string} itemName the name of the item to pull IDs for
+   * @returns {string[]} the IDs of the item/s associated with the given
+   * itemName
    */
   getFormItemIdWithName(itemName) {
     const formItems = spreadSheetHelper.getFormItems();
-    if (formItems[itemName] !== undefined) {
-      return formItems[itemName].id;
+    let formItemId = formItems[itemName].id;
+    if (formItemId !== undefined) {
+      formItemId = formItemId.toString();
+      if (formItemId.includes(';')) {
+        return formItemId.split(';');
+      }
+      return [formItemId];
     }
     throw new Error(`Form item with name ${itemName} has not been stored`);
   },
@@ -74,12 +80,14 @@ const SpreadSheet = {
    * Adds an ID for the given form item to the hidden Google sheet. If the same
    * name already exists, it overwrites it.
    *
-   * @param {FormItemName} itemName the name of the item to enter an ID for
-   * @param {string} itemId the ID from item.getId()
+   * @param {FormItemDetails} itemDetails the details of the item to store
+   * @param {string} itemId the ID or IDs from item.getId(). If multiple IDs
+   * are being added, then use a `;` to deliniate them.
    */
-  addFormItemId(itemName, itemId) {
+  addFormItemId(itemDetails, itemId) {
     const formItemIdSheet = spreadSheetHelper.getFormItemIdsSheet();
     const formItems = spreadSheetHelper.getFormItems();
+    const { itemName } = itemDetails;
 
     // If the item already exists
     if (formItems[itemName] !== undefined) {
@@ -99,6 +107,15 @@ const SpreadSheet = {
       rowNum: newRowNum,
     };
     formItemIdSheet.getRange(newRowNum, 1, 1, 2).setValues([[itemName, itemId]]);
+  },
+
+  /**
+   * Get the object holding the different form items and their Ids.
+   *
+   * @returns {FormItemsObj} the complete formItemsObj
+   */
+  getFormItemsObj() {
+    return spreadSheetHelper.getFormItems();
   },
 };
 

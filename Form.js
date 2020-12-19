@@ -1,17 +1,24 @@
 /**
- * The variable names of the items put on the survey. These are used to
- * store their ID in a hidden sheet.
+ * The details of an item stored in the survey. Sometimes the item actually
+ * represents multiple items when those extra items are variable in quantity.
  *
- * @typedef FormItemName
- * @type { 'asuriteQuestion' |
- *  'githubUsername' |
- *  'taigaEmail' |
- *  'timeZone' |
- *  'preferredStudents' |
- *  'dislikedStudents' |
- *  'availability' |
- *  'proficiencyQuestions'
- * }
+ * @typedef FormItemDetails
+ * @type {{
+ *  itemName: string,
+ *  multipleItems: boolean,
+ *  addItemResponse: (data: ResponseCreationData) => void,
+ * }}
+ */
+
+/**
+ * Holds information that may be needed to create a response for any given
+ * form item.
+ *
+ * @typedef ResponseCreationData
+ * @type {{
+ *  formResponse: GoogleAppsScript.Forms.FormResponse,
+ *  asurite: string
+ * }}
  */
 
 /**
@@ -19,6 +26,84 @@
  * could be, attached to the Google Sheet for this script.
  */
 const Form = {
+
+  /**
+   * The constant holding information and values for each item or set of items
+   * in the form. These values are used for retrieval, storage, and processing,
+   * but should not be manipulated.
+   *
+   * @type {{
+   *  [itemName: string]: FormItemDetails
+   * }}
+   */
+  ITEMS: {
+    asuriteQuestion: {
+      itemName: 'asuriteQuestion',
+      multipleItems: false,
+      addItemResponse(data) {
+        const { formResponse, asurite } = data;
+        const asuriteItem = Form.getItemsWithName(this.itemName)[0]
+          .asListItem();
+        const asuriteResponse = asuriteItem.createResponse(asurite);
+        formResponse.withItemResponse(asuriteResponse);
+      },
+    },
+    githubUsername: {
+      itemName: 'githubUsername',
+      multipleItems: false,
+      addItemResponse(data) {
+        const { formResponse, asurite } = data;
+        const githubItem = Form.getItemsWithName(this.itemName)[0]
+          .asTextItem();
+        const githubResponse = githubItem.createResponse(asurite);
+        formResponse.withItemResponse(githubResponse);
+      },
+    },
+    taigaEmail: {
+      itemName: 'taigaEmail',
+      multipleItems: false,
+      addItemResponse(data) {
+        const { formResponse, asurite } = data;
+        const taigaItem = Form.getItemsWithName(this.itemName)[0]
+          .asTextItem();
+        const taigaResponse = taigaItem.createResponse(`${asurite}@gmail.com`);
+        formResponse.withItemResponse(taigaResponse);
+      },
+    },
+    timeZone: {
+      itemName: 'timeZone',
+      multipleItems: false,
+      addItemResponse(data) {
+        const { formResponse } = data;
+        const timeZoneItem = Form.getItemsWithName(this.itemName)[0]
+          .asListItem();
+        const randomTimeZone = DateUtil.getRandomUTCTimeZone();
+        const timeZoneResponse = timeZoneItem.createResponse(randomTimeZone);
+        formResponse.withItemResponse(timeZoneResponse);
+      },
+    },
+    preferredStudents: {
+      itemName: 'preferredStudents',
+      multipleItems: true,
+      addItemResponse(data) {
+        // Not implemented yet
+      },
+    },
+    proficiencyQuestions: {
+      itemName: 'proficiencyQuestions',
+      multipleItems: true,
+      addItemResponse(data) {
+        // Not implemented yet
+      },
+    },
+    availability: {
+      itemName: 'availability',
+      multipleItems: false,
+      addItemResponse(data) {
+        // Not implemented yet
+      },
+    },
+  },
 
   /**
    * Creates a new form and assigns the form ID to the appropriate location
@@ -123,6 +208,20 @@ const Form = {
     for (let i = formItems.length - 1; i >= 0; i--) {
       form.deleteItem(i);
     }
+  },
+
+  /**
+   * Gets the form item/s with the given name. This might be a set of items
+   * or a single item depending on the one chosen.
+   *
+   * @param {string} itemName the name of the item to retrieve. This should
+   * be pulled in from the ITEMS object instead of manually.
+   * @returns {GoogleAppsScript.Forms.Item[]} the set of items in an array
+   */
+  getItemsWithName(itemName) {
+    const form = this.get();
+    const itemIds = SpreadSheet.getFormItemIdWithName(itemName);
+    return itemIds.map((itemId) => form.getItemById(itemId));
   },
 };
 
@@ -239,12 +338,7 @@ const formHelper = {
       .setTitle('In what time zone do you live or will you be during the'
       + ' session? Please use UTC so we can match it easier.');
 
-    const choices = [];
-
-    // Generate UTC timezones choices
-    for (let i = -11; i <= 12; i++) {
-      choices.push(`UTC ${i < 0 ? '' : '+'}${i}`);
-    }
+    const choices = DateUtil.getUTCTimeZoneStrings();
 
     listItem.setChoiceValues(choices)
       .setRequired(true);

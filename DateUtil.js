@@ -67,6 +67,33 @@ const DateUtil = {
   },
 
   /**
+   * Gets the UTC time zones strings. For example `UTC +8`.
+   *
+   * @returns {string[]} the completed set of UTC time zones strings
+   */
+  getUTCTimeZoneStrings() {
+    if (dateUtilHelper.utcTimeZoneStrings !== null) {
+      return dateUtilHelper.utcTimeZoneStrings;
+    }
+    dateUtilHelper.utcTimeZoneStrings = [];
+    for (let i = -11; i <= 12; i++) {
+      dateUtilHelper.utcTimeZoneStrings.push(`UTC ${i < 0 ? '' : '+'}${i}`);
+    }
+    return dateUtilHelper.utcTimeZoneStrings;
+  },
+
+  /**
+   * Gets a random UTC time zone string.
+   *
+   * @returns {string}
+   */
+  getRandomUTCTimeZone() {
+    const timeZoneStrings = this.getUTCTimeZoneStrings();
+    const index = dateUtilHelper.getRandomInt(timeZoneStrings.length);
+    return timeZoneStrings[index];
+  },
+
+  /**
    * Adds the given amount of hours to the given date.
    *
    * @param {Date} date the date to add hours to
@@ -100,5 +127,18 @@ const DateUtil = {
       adjustedHour = hour - 12;
     }
     return `${adjustedHour}:00 ${this.getAmPmFromHour(hour)}`;
+  },
+};
+
+const dateUtilHelper = {
+  utcTimeZoneStrings: null,
+
+  /**
+   * Gets a random number from 0 to the given max (exclusive).
+   *
+   * @param {Number} max
+   */
+  getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
   },
 };
