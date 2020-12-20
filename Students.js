@@ -67,6 +67,30 @@ const Students = {
       .sort();
     return studentsHelper.asuriteNameComboStrings;
   },
+
+  /**
+   * Gets a random asurite ID that is not the one provided.
+   *
+   * @param {string} asuriteToSkip the asurite ID to skip
+   * @param {Number} numIds the number of IDs to get. These will be unique,
+   * and there will not be duplicates.
+   * @returns {string[]} the random asurite IDs
+   */
+  getRandomAsurites(asuriteToSkip, numIds) {
+    // Get a copy of the asurite IDs and take the one to skip out
+    const studentsObjCopy = { ...this.getAll() };
+    delete studentsObjCopy[asuriteToSkip];
+
+    // Create the array of values to choose from
+    const studentsArr = Object.values(studentsObjCopy);
+
+    const asuIds = [];
+    for (let i = 0; i < numIds; i++) {
+      const randomIdIndex = Util.getRandomInt(studentsArr.length);
+      asuIds.push(studentsArr.splice(randomIdIndex, 1)[0]);
+    }
+    return asuIds;
+  },
 };
 
 /**
