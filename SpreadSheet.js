@@ -80,14 +80,13 @@ const SpreadSheet = {
    * Adds an ID for the given form item to the hidden Google sheet. If the same
    * name already exists, it overwrites it.
    *
-   * @param {FormItemDetails} itemDetails the details of the item to store
+   * @param {string} itemName the name of the item to add the form ID for
    * @param {string} itemId the ID or IDs from item.getId(). If multiple IDs
    * are being added, then use a `;` to deliniate them.
    */
-  addFormItemId(itemDetails, itemId) {
+  addFormItemId(itemName, itemId) {
     const formItemIdSheet = spreadSheetHelper.getFormItemIdsSheet();
     const formItems = spreadSheetHelper.getFormItems();
-    const { itemName } = itemDetails;
 
     // If the item already exists
     if (formItems[itemName] !== undefined) {

@@ -63,7 +63,8 @@ const Students = {
     }
     const studentsObj = this.getAll();
     studentsHelper.asuriteNameComboStrings = Object.values(studentsObj)
-      .map((studentObj) => `${studentObj.asuId} - ${studentObj.fullName}`)
+      .map((studentObj) => studentsHelper
+        .createIdNameComboString(studentObj.asuId, studentObj.fullName))
       .sort();
     return studentsHelper.asuriteNameComboStrings;
   },
@@ -77,19 +78,39 @@ const Students = {
    * @returns {string[]} the random asurite IDs
    */
   getRandomAsurites(asuriteToSkip, numIds) {
+    if (numIds === 0) {
+      return [];
+    }
+
     // Get a copy of the asurite IDs and take the one to skip out
     const studentsObjCopy = { ...this.getAll() };
     delete studentsObjCopy[asuriteToSkip];
 
     // Create the array of values to choose from
-    const studentsArr = Object.values(studentsObjCopy);
+    const studentsObjArr = Object.values(studentsObjCopy);
 
     const asuIds = [];
     for (let i = 0; i < numIds; i++) {
-      const randomIdIndex = Util.getRandomInt(studentsArr.length);
-      asuIds.push(studentsArr.splice(randomIdIndex, 1)[0]);
+      const randomIdIndex = Util.getRandomInt(studentsObjArr.length);
+      asuIds.push(studentsObjArr.splice(randomIdIndex, 1)[0].asuId);
     }
     return asuIds;
+  },
+
+  /**
+   * Gets a set of random asurite ID, name combos that are not the one provided.
+   *
+   * @param {string} asuriteToSkip the asurite ID to skip
+   * @param {Number} numIds the number of IDs to get. These will be unique,
+   * and there will not be duplicates.
+   * @returns {string[]} the random asurite ID, name combos
+   */
+  getRandomAsuriteNameCombos(asuriteToSkip, numIds) {
+    const studentsObj = this.getAll();
+    const randomIds = this.getRandomAsurites(asuriteToSkip, numIds);
+    return randomIds.map((asuriteId) => studentsHelper
+      .createIdNameComboString(studentsObj[asuriteId].asuId,
+        studentsObj[asuriteId].fullName));
   },
 };
 
@@ -149,4 +170,15 @@ const studentsHelper = {
     return this.studentsObj;
   },
 
+  /**
+   * Creates the asurite ID, name combo string. For example
+   * `aneuhold - Anton Neuhold`. This is just to standardize the format so if
+   * it changes here, it changes everywhere.
+   *
+   * @param {string} asuriteId the ID to create the string for
+   * @returns {string} the asurite ID, name combo string
+   */
+  createIdNameComboString(asuId, fullName) {
+    return `${asuId} - ${fullName}`;
+  },
 };

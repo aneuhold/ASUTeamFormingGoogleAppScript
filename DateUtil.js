@@ -89,7 +89,7 @@ const DateUtil = {
    */
   getRandomUTCTimeZone() {
     const timeZoneStrings = this.getUTCTimeZoneStrings();
-    const index = dateUtilHelper.getRandomInt(timeZoneStrings.length);
+    const index = Util.getRandomInt(timeZoneStrings.length);
     return timeZoneStrings[index];
   },
 
@@ -132,13 +132,4 @@ const DateUtil = {
 
 const dateUtilHelper = {
   utcTimeZoneStrings: null,
-
-  /**
-   * Gets a random number from 0 to the given max (exclusive).
-   *
-   * @param {Number} max
-   */
-  getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-  },
 };

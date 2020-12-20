@@ -86,7 +86,16 @@ const Form = {
       itemName: 'preferredStudents',
       multipleItems: true,
       addItemResponse(data) {
-        // Not implemented yet
+        const { formResponse, asurite } = data;
+        const preferredStudentsItems = Form.getItemsWithName(this.itemName);
+        const randomNumStudents = Util.getRandomInt(preferredStudentsItems.length);
+        const randomAsuriteIds = Students
+          .getRandomAsuriteNameCombos(asurite, randomNumStudents);
+        for (let i = 0; i < randomNumStudents; i++) {
+          const listItem = preferredStudentsItems[i].asListItem();
+          const itemResponse = listItem.createResponse(randomAsuriteIds[i]);
+          formResponse.withItemResponse(itemResponse);
+        }
       },
     },
     proficiencyQuestions: {
@@ -221,6 +230,9 @@ const Form = {
   getItemsWithName(itemName) {
     const form = this.get();
     const itemIds = SpreadSheet.getFormItemIdWithName(itemName);
+    if (itemIds.length === 0) {
+      throw new Error(`No item ids found for ${itemName}`);
+    }
     return itemIds.map((itemId) => form.getItemById(itemId));
   },
 
