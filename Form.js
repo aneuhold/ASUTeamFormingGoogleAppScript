@@ -98,6 +98,22 @@ const Form = {
         }
       },
     },
+    dislikedStudents: {
+      itemName: 'dislikedStudents',
+      multipleItems: true,
+      addItemResponse(data) {
+        const { formResponse, asurite } = data;
+        const dislikedStudentsItems = Form.getItemsWithName(this.itemName);
+        const randomNumStudents = Util.getRandomInt(dislikedStudentsItems.length);
+        const randomAsuriteIds = Students
+          .getRandomAsuriteNameCombos(asurite, randomNumStudents);
+        for (let i = 0; i < randomNumStudents; i++) {
+          const listItem = dislikedStudentsItems[i].asListItem();
+          const itemResponse = listItem.createResponse(randomAsuriteIds[i]);
+          formResponse.withItemResponse(itemResponse);
+        }
+      },
+    },
     proficiencyQuestions: {
       itemName: 'proficiencyQuestions',
       multipleItems: true,
