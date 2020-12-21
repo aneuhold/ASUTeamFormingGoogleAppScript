@@ -23,8 +23,12 @@ function clearForm() {
   Form.deleteAllItems();
 }
 
-function addTestResponses() {
+function addTestResponse() {
   Test.submitTestResponsesForStudent('aneuhold');
+}
+
+function addTestResponses() {
+
 }
 
 function permanentlyClearResponses() {

@@ -118,7 +118,13 @@ const Form = {
       itemName: 'proficiencyQuestions',
       multipleItems: true,
       addItemResponse(data) {
-        // Not implemented yet
+        const { formResponse } = data;
+        const proficiencyItems = Form.getItemsWithName(this.itemName);
+        proficiencyItems.forEach((item) => {
+          const scaleItem = item.asScaleItem();
+          const itemResponse = scaleItem.createResponse(Util.getRandomInt(5) + 1);
+          formResponse.withItemResponse(itemResponse);
+        });
       },
     },
     availability: {
@@ -141,7 +147,6 @@ const Form = {
             }
           }
         }
-        Logger.log(responseGrid);
         const itemResponse = availabilityItem.createResponse(responseGrid);
         formResponse.withItemResponse(itemResponse);
       },

@@ -16,4 +16,11 @@ const Test = {
     });
     formResponse.submit();
   },
+
+  submitTestResponsesForAllStudents() {
+    const asuriteIds = Students.getAsuriteIdsSorted();
+    asuriteIds.forEach((id) => {
+      this.submitTestResponsesForStudent(id);
+    });
+  },
 };
