@@ -6,8 +6,11 @@ To develop for this project, `clasp` can be used to write code and push it to th
 
 ## Backlog
 
+- Group Forming
+   - [ ] Setup a way to compile the response data into a unified object
+   - [ ] Find an algorithm that will work for this
 - Testing
-   - [ ] Setup a testing file that can be used to test submissions from various students
+   - [x] Setup a testing file that can be used to test submissions from various students
    - [x] Setup a way to delete the attached form and unlink from the spreadsheet
 - Config
    - Add part of the config that will allow hour increments to be chosen
