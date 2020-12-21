@@ -125,7 +125,25 @@ const Form = {
       itemName: 'availability',
       multipleItems: false,
       addItemResponse(data) {
-        // Not implemented yet
+        const { formResponse } = data;
+        const availabilityItem = Form.getItemsWithName(this.itemName)[0]
+          .asCheckboxGridItem();
+        const numColumns = availabilityItem.getColumns().length;
+        const numRows = availabilityItem.getRows().length;
+        const weekDays = DateUtil.getWeekdayStrings();
+        const responseGrid = [];
+        for (let row = 0; row < numRows; row++) {
+          responseGrid[row] = [];
+          for (let col = 0; col < numColumns; col++) {
+            const coinFlip = Util.getRandomInt(2);
+            if (coinFlip === 1) {
+              responseGrid[row].push(weekDays[col]);
+            }
+          }
+        }
+        Logger.log(responseGrid);
+        const itemResponse = availabilityItem.createResponse(responseGrid);
+        formResponse.withItemResponse(itemResponse);
       },
     },
   },
