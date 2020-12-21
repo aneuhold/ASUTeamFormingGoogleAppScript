@@ -28,7 +28,7 @@ function addTestResponse() {
 }
 
 function addTestResponses() {
-
+  Test.submitTestResponsesForAllStudents();
 }
 
 function permanentlyClearResponses() {

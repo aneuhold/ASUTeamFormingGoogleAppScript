@@ -88,7 +88,7 @@ const Form = {
       addItemResponse(data) {
         const { formResponse, asurite } = data;
         const preferredStudentsItems = Form.getItemsWithName(this.itemName);
-        const randomNumStudents = Util.getRandomInt(preferredStudentsItems.length);
+        const randomNumStudents = Util.getRandomInt(preferredStudentsItems.length + 1);
         const randomAsuriteIds = Students
           .getRandomAsuriteNameCombos(asurite, randomNumStudents);
         for (let i = 0; i < randomNumStudents; i++) {
@@ -104,7 +104,7 @@ const Form = {
       addItemResponse(data) {
         const { formResponse, asurite } = data;
         const dislikedStudentsItems = Form.getItemsWithName(this.itemName);
-        const randomNumStudents = Util.getRandomInt(dislikedStudentsItems.length);
+        const randomNumStudents = Util.getRandomInt(dislikedStudentsItems.length + 1);
         const randomAsuriteIds = Students
           .getRandomAsuriteNameCombos(asurite, randomNumStudents);
         for (let i = 0; i < randomNumStudents; i++) {
