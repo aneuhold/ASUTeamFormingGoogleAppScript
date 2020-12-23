@@ -3,6 +3,12 @@
  * @type {{
  *  fullName: string,
  *  asuId: string,
+ *  preferredStudents: string[],
+ *  dislikedStudents: string[],
+ *  proficiencies: Number[],
+ *  utcTimeZone: Number,
+ *  taigaEmail: string,
+ *  githubUsername: string
  * }}
  */
 
@@ -135,7 +141,8 @@ const studentsHelper = {
   asuriteNameComboStrings: null,
 
   /**
-   * Creates a Students Object by pulling information from the "Students" sheet.
+   * Creates a Students Object by pulling information from the "Students" sheet,
+   * and from the responses if they exist.
    *
    * @returns {StudentsObj} the completed students object
    */
@@ -163,11 +170,93 @@ const studentsHelper = {
       studentsObj[asuId] = {
         asuId,
         fullName,
+        preferredStudents: [],
+        dislikedStudents: [],
       };
     }
 
+    const form = Form.get();
+    const responses = form.getResponses();
+    if (responses.length === 0) {
+      this.studentsObj = studentsObj;
+      return this.studentsObj;
+    }
+
+    // Pull information from the responses
+    responses.forEach((response) => {
+      this.extractDataFromResponse(studentsObj, response);
+    });
+
+    Logger.log(JSON.stringify(studentsObj, null, 2));
+
     this.studentsObj = studentsObj;
     return this.studentsObj;
+  },
+
+  /**
+   * Extracts the data from a response into the provided studentsObj.
+   *
+   * @param {StudentsObj} studentsObj the studentsObj to put the extracted
+   * data into
+   * @param {GoogleAppsScript.Forms.FormResponse} formResponse the response to
+   * extract data from
+   */
+  extractDataFromResponse(studentsObj, formResponse) {
+    const { ITEMS } = Form;
+    const asuriteItem = Form.getItemsWithName(ITEMS.asuriteQuestion.itemName)[0];
+    const asurite = formResponse.getResponseForItem(asuriteItem).getResponse();
+    if (studentsObj[asurite] === undefined) {
+      throw new Error(`asurite of ${asurite} was not defined in the `
+      + ' studentsObj');
+    }
+
+    // Preferred students
+    this.extractTeammatePreferences(ITEMS.preferredStudents.itemName,
+      formResponse, studentsObj, asurite);
+
+    // Disliked students
+    this.extractTeammatePreferences(ITEMS.dislikedStudents.itemName,
+      formResponse, studentsObj, asurite);
+  },
+
+  /**
+   * Gets the teammate preferences and puts it into the provided `studentsObj`
+   * depending on which `itemName` is given. This can be used with preferred
+   * students or disliked students.
+   *
+   * @param {string} itemName the name of the form item to get the preference
+   * for. For example `preferredStudents`.
+   * @param {GoogleAppsScript.Forms.FormResponse} formResponse
+   * @param {StudentObj} studentsObj
+   * @param {string} asurite the asurite of the student to give the teammate
+   * preferences to
+   */
+  extractTeammatePreferences(itemName, formResponse, studentsObj, asurite) {
+    const studentsItems = Form.getItemsWithName(itemName);
+    studentsItems.forEach((studentItem) => {
+      const studentString = this.getResponseFromItem(formResponse, studentItem);
+      if (studentString !== null) {
+        const studentId = this.getIdFromNameComboString(studentString);
+        studentsObj[asurite][itemName].push(studentId);
+      }
+    });
+  },
+
+  /**
+   * Gets the response data for the given item from the given form response
+   * object. Returns null if no response exists for that item.
+   *
+   * @param {GoogleAppsScript.Forms.FormResponse} formResponse
+   * @param {GoogleAppsScript.Forms.Item} formItem
+   * @returns {null | string | string[] | string[][]} null if no response and
+   * one of the different types of reponse data that can be returned
+   */
+  getResponseFromItem(formResponse, formItem) {
+    const itemResponse = formResponse.getResponseForItem(formItem);
+    if (itemResponse === null) {
+      return null;
+    }
+    return itemResponse.getResponse();
   },
 
   /**
@@ -180,5 +269,17 @@ const studentsHelper = {
    */
   createIdNameComboString(asuId, fullName) {
     return `${asuId} - ${fullName}`;
+  },
+
+  /**
+   * Pulls the ID out of an already assembled name-combo string.
+   *
+   * See `createIdNameComboString`
+   *
+   * @param {string} str the name-combo string to pull the asurite ID out of
+   * @returns {string} the asurite ID
+   */
+  getIdFromNameComboString(str) {
+    return str.split(' ')[0];
   },
 };

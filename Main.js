@@ -23,6 +23,10 @@ function clearForm() {
   Form.deleteAllItems();
 }
 
+function generateResults() {
+  Results.generateResultsSheet();
+}
+
 function addTestResponse() {
   Test.submitTestResponsesForStudent('aneuhold');
 }
