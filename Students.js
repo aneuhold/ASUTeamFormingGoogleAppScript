@@ -229,6 +229,11 @@ const studentsHelper = {
     const githubUsername = this.getResponseFromItem(formResponse, githubItem);
     this.studentsObj[asurite].githubUsername = githubUsername;
 
+    // Timezone
+    const timezoneItem = Form.getItemsWithName(ITEMS.timeZone.itemName)[0];
+    const timezone = this.getResponseFromItem(formResponse, timezoneItem);
+    this.studentsObj[asurite].utcTimeZone = timezone;
+
     // Proficiencies
     const proficiencyItems = Form
       .getItemsWithName(ITEMS.proficiencyQuestions.itemName);
