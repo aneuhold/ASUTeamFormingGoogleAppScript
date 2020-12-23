@@ -172,72 +172,92 @@ const studentsHelper = {
         fullName,
         preferredStudents: [],
         dislikedStudents: [],
+        proficiencies: [],
       };
     }
 
     const form = Form.get();
     const responses = form.getResponses();
+    this.studentsObj = studentsObj;
     if (responses.length === 0) {
-      this.studentsObj = studentsObj;
       return this.studentsObj;
     }
 
     // Pull information from the responses
     responses.forEach((response) => {
-      this.extractDataFromResponse(studentsObj, response);
+      this.extractDataFromResponse(response);
     });
 
-    Logger.log(JSON.stringify(studentsObj, null, 2));
+    Logger.log(JSON.stringify(this.studentsObj, null, 2));
 
-    this.studentsObj = studentsObj;
     return this.studentsObj;
   },
 
   /**
-   * Extracts the data from a response into the provided studentsObj.
+   * Extracts the data from a response into the locally held studentsObj.
    *
-   * @param {StudentsObj} studentsObj the studentsObj to put the extracted
-   * data into
    * @param {GoogleAppsScript.Forms.FormResponse} formResponse the response to
    * extract data from
    */
-  extractDataFromResponse(studentsObj, formResponse) {
+  extractDataFromResponse(formResponse) {
     const { ITEMS } = Form;
     const asuriteItem = Form.getItemsWithName(ITEMS.asuriteQuestion.itemName)[0];
     const asurite = formResponse.getResponseForItem(asuriteItem).getResponse();
-    if (studentsObj[asurite] === undefined) {
+    if (typeof asurite !== 'string') {
+      throw new Error('asurite question was not answered for this response');
+    }
+    if (this.studentsObj[asurite] === undefined) {
       throw new Error(`asurite of ${asurite} was not defined in the `
       + ' studentsObj');
     }
 
     // Preferred students
     this.extractTeammatePreferences(ITEMS.preferredStudents.itemName,
-      formResponse, studentsObj, asurite);
+      formResponse, asurite);
 
     // Disliked students
     this.extractTeammatePreferences(ITEMS.dislikedStudents.itemName,
-      formResponse, studentsObj, asurite);
+      formResponse, asurite);
+
+    // Taiga email
+    const taigaItem = Form.getItemsWithName(ITEMS.taigaEmail.itemName)[0];
+    const taigaEmail = this.getResponseFromItem(formResponse, taigaItem);
+    this.studentsObj[asurite].taigaEmail = taigaEmail;
+
+    // Github username
+    const githubItem = Form.getItemsWithName(ITEMS.githubUsername.itemName)[0];
+    const githubUsername = this.getResponseFromItem(formResponse, githubItem);
+    this.studentsObj[asurite].githubUsername = githubUsername;
+
+    // Proficiencies
+    const proficiencyItems = Form
+      .getItemsWithName(ITEMS.proficiencyQuestions.itemName);
+    proficiencyItems.forEach((proficiencyItem) => {
+      const proficiencyScore = this
+        .getResponseFromItem(formResponse, proficiencyItem);
+      this.studentsObj[asurite].proficiencies.push(proficiencyScore);
+    });
   },
 
   /**
-   * Gets the teammate preferences and puts it into the provided `studentsObj`
+   * Gets the teammate preferences and puts it into the local `studentsObj`
    * depending on which `itemName` is given. This can be used with preferred
    * students or disliked students.
    *
    * @param {string} itemName the name of the form item to get the preference
    * for. For example `preferredStudents`.
-   * @param {GoogleAppsScript.Forms.FormResponse} formResponse
-   * @param {StudentObj} studentsObj
+   * @param {GoogleAppsScript.Forms.FormResponse} formResponse the formResponse
+   * to extract the preferences from
    * @param {string} asurite the asurite of the student to give the teammate
    * preferences to
    */
-  extractTeammatePreferences(itemName, formResponse, studentsObj, asurite) {
+  extractTeammatePreferences(itemName, formResponse, asurite) {
     const studentsItems = Form.getItemsWithName(itemName);
     studentsItems.forEach((studentItem) => {
       const studentString = this.getResponseFromItem(formResponse, studentItem);
       if (studentString !== null) {
         const studentId = this.getIdFromNameComboString(studentString);
-        studentsObj[asurite][itemName].push(studentId);
+        this.studentsObj[asurite][itemName].push(studentId);
       }
     });
   },
