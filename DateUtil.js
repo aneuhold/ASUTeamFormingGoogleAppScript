@@ -22,7 +22,7 @@ const DateUtil = {
 
   /**
    * Generates an array of strings representing time slots. Each time slot
-   * will be the lenght of time indicated by the given `numHours`. The time
+   * will be the length of time indicated by the given `numHours`. The time
    * slots start with midnight.
    *
    * @param {Number} numHours the number of hours to increment for each

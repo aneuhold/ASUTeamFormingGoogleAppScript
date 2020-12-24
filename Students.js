@@ -8,7 +8,8 @@
  *  proficiencies: Number[],
  *  utcTimeZone: Number,
  *  taigaEmail: string,
- *  githubUsername: string
+ *  githubUsername: string,
+ *  availability: AvailbilityObj[]
  * }}
  */
 
@@ -16,6 +17,13 @@
  * @typedef StudentsObj
  * @type {{
  *  [asuId: string]: StudentObj
+ * }}
+ */
+
+/**
+ * @typedef AvailbilityObj
+ * @type {{
+ *  [dayOfWeek: string]: boolean
  * }}
  */
 
@@ -141,6 +149,19 @@ const studentsHelper = {
   asuriteNameComboStrings: null,
 
   /**
+   * Used to enter the students availability for each time period.
+   */
+  AVAILABILITY_TEMPLATE: {
+    Sunday: false,
+    Monday: false,
+    Tuesday: false,
+    Wednesday: false,
+    Thursday: false,
+    Friday: false,
+    Saturday: false,
+  },
+
+  /**
    * Creates a Students Object by pulling information from the "Students" sheet,
    * and from the responses if they exist.
    *
@@ -173,6 +194,7 @@ const studentsHelper = {
         preferredStudents: [],
         dislikedStudents: [],
         proficiencies: [],
+        availability: [],
       };
     }
 
@@ -183,9 +205,12 @@ const studentsHelper = {
       return this.studentsObj;
     }
 
+    // Get the time strings
+    const timeStrings = DateUtil.generateTimeStrings(3);
+
     // Pull information from the responses
     responses.forEach((response) => {
-      this.extractDataFromResponse(response);
+      this.extractDataFromResponse(response, timeStrings);
     });
 
     Logger.log(JSON.stringify(this.studentsObj, null, 2));
@@ -198,8 +223,10 @@ const studentsHelper = {
    *
    * @param {GoogleAppsScript.Forms.FormResponse} formResponse the response to
    * extract data from
+   * @param {string[]} timeStrings the time strings generated for the form that the
+   * data is being extracted from
    */
-  extractDataFromResponse(formResponse) {
+  extractDataFromResponse(formResponse, timeStrings) {
     const { ITEMS } = Form;
     const asuriteItem = Form.getItemsWithName(ITEMS.asuriteQuestion.itemName)[0];
     const asurite = formResponse.getResponseForItem(asuriteItem).getResponse();
@@ -242,6 +269,9 @@ const studentsHelper = {
         .getResponseFromItem(formResponse, proficiencyItem);
       this.studentsObj[asurite].proficiencies.push(proficiencyScore);
     });
+
+    // Availability
+    this.extractAvailability(formResponse, asurite, timeStrings);
   },
 
   /**
@@ -264,6 +294,40 @@ const studentsHelper = {
         const studentId = this.getIdFromNameComboString(studentString);
         this.studentsObj[asurite][itemName].push(studentId);
       }
+    });
+  },
+
+  /**
+   * Extracts the availability from the given form response into the
+   * `studentsObj` for the given asurite.
+   *
+   * @param {GoogleAppsScript.Forms.FormResponse} formResponse
+   * @param {string} asurite
+   * @param {string[]} timeStrings
+   */
+  extractAvailability(formResponse, asurite, timeStrings) {
+    const availabilityItem = Form
+      .getItemsWithName(Form.ITEMS.availability.itemName)[0];
+    const availabilityArr = this
+      .getResponseFromItem(formResponse, availabilityItem);
+
+    // If no response comes back, then assign no avaialability
+    if (!Array.isArray(availabilityArr)) {
+      timeStrings.forEach((timeString) => {
+        const availabilityForTime = { ...this.AVAILABILITY_TEMPLATE };
+        this.studentsObj[asurite].availability.push(availabilityForTime);
+      });
+      return;
+    }
+
+    timeStrings.forEach((timeString, i) => {
+      const availabilityForTime = { ...this.AVAILABILITY_TEMPLATE };
+      if (availabilityArr[i] !== null) {
+        availabilityArr[i].forEach((dayOfWeek) => {
+          availabilityForTime[dayOfWeek] = true;
+        });
+      }
+      this.studentsObj[asurite].availability[i] = availabilityForTime;
     });
   },
 
