@@ -1,6 +1,9 @@
 /**
  * This file is used for housing the main functions that the sheet will run
  * through button presses.
+ *
+ * Link to the github repo for these scripts:
+ * https://github.com/aneuhold/ASUTeamFormingGoogleAppScript
  */
 
 /**
