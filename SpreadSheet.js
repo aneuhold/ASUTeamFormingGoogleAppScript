@@ -116,6 +116,43 @@ const SpreadSheet = {
   getFormItemsObj() {
     return spreadSheetHelper.getFormItems();
   },
+
+  /**
+   * Adds a single row to the given named range.
+   *
+   * @param {string} namedRangeName the name of the named range to add a row
+   * after
+   * @returns {void}
+   */
+  addRowToNamedRange(namedRangeName) {
+    const namedRange = this.get().getRangeByName(namedRangeName);
+    const sheet = namedRange.getSheet();
+
+    // Add a row after the last row in the named range
+    const lastRow = namedRange.getLastRow();
+    sheet.insertRowAfter(lastRow);
+
+    // Update the range so it includes the new row
+    const newRange = sheet.getRange(namedRange.getRow(), namedRange.getColumn(),
+      namedRange.getNumRows() + 1, namedRange.getNumColumns());
+
+    // Set the updated range to the named range
+    this.get().setNamedRange(namedRangeName, newRange);
+  },
+
+  /**
+   * Removes a row from the given named range.
+   *
+   * @param {string} namedRangeName the name of the range to remove a row from.
+   */
+  removeRowFromNamedRange(namedRangeName) {
+    const namedRange = this.get().getRangeByName(namedRangeName);
+    const sheet = namedRange.getSheet();
+
+    // Remove the row
+    const lastRow = namedRange.getLastRow();
+    sheet.deleteRow(lastRow);
+  },
 };
 
 /**
