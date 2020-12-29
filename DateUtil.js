@@ -29,7 +29,7 @@ const DateUtil = {
    * time string
    * @returns {string[]} the completed set of time strings
    */
-  generateTimeStrings(numHours) {
+  generateTimeStrings(numHours = 3) {
     let current24Hour = 0;
     const timeStrings = [];
     while (current24Hour + numHours <= 24) {

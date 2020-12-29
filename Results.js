@@ -108,6 +108,19 @@ const resultsHelper = {
         studentObjArrIndex: i,
       });
     }
+
+    // Availability
+    const weekdays = DateUtil.getWeekdayStrings();
+    const timeStrings = DateUtil.generateTimeStrings();
+    weekdays.forEach((weekday) => {
+      timeStrings.forEach((timeString, i) => {
+        this.columns.push({
+          title: `${weekday} - ${timeString}`,
+          studentObjKey: 'availability',
+          studentObjArrIndex: i,
+        });
+      });
+    });
   },
 
   /**
@@ -118,10 +131,13 @@ const resultsHelper = {
    * @returns {void}
    */
   createHeaders(sheet) {
+    const weekdays = DateUtil.getWeekdayStrings();
     this.getColumnsArr().forEach((columnObj, i) => {
       sheet.getRange(1, i + 1).setValue(columnObj.title);
       if (columnObj.studentObjKey === 'proficiencies') {
         this.applyGradientConditionalFormatting(sheet, i + 1);
+      } else if (columnObj.studentObjKey === 'availability') {
+        sheet.setColumnWidth(i + 1, 20);
       }
     });
   },
@@ -159,13 +175,30 @@ const resultsHelper = {
   populateWithStudentResults(sheet) {
     const studentsObj = Students.getAll();
     const columnsArr = this.getColumnsArr();
+    const weekdays = DateUtil.getWeekdayStrings();
     Object.values(studentsObj).forEach((studentObj, studentIndex) => {
+      let currentWeekdayIndex = 0;
+      const timeStringArrLength = DateUtil.generateTimeStrings().length;
       columnsArr.forEach((columnObj, columnIndex) => {
         const { studentObjKey, studentObjArrIndex } = columnObj;
+
         // If the columnObj has an array value
         if (studentObjArrIndex === null) {
           sheet.getRange(studentIndex + 2, columnIndex + 1)
             .setValue(studentObj[studentObjKey]);
+
+        // The columnObj is part of the availability grid
+        } else if (studentObjKey === 'availability') {
+          const currentWeekday = weekdays[currentWeekdayIndex];
+          const available = studentObj[studentObjKey][studentObjArrIndex][currentWeekday];
+          if (available) {
+            sheet.getRange(studentIndex + 2, columnIndex + 1)
+              .setBackground('#3ECD35');
+          }
+
+          if (studentObjArrIndex === timeStringArrLength - 1) {
+            currentWeekdayIndex++;
+          }
         } else if (studentObj[studentObjKey][studentObjArrIndex] !== undefined) {
           sheet.getRange(studentIndex + 2, columnIndex + 1)
             .setValue(studentObj[studentObjKey][studentObjArrIndex]);
