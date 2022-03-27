@@ -4,6 +4,8 @@
 
 To develop for this project, `clasp` can be used to write code and push it to the sheet specified in the `.clasp.json` file. In order to get this ID, you can go to a sheet and go to the "Script Editor" window from "Tools" then copy the last part of the URL.
 
+Here is a [link to the folder with the Google Apps Scripts templates](https://drive.google.com/drive/folders/1eAC6Vg6lrjgYQsVWtL7pcjJbpYVhz2zk). Correct permissions are needed to access this folder.
+
 ## Backlog
 
 - Group Forming
@@ -18,3 +20,4 @@ To develop for this project, `clasp` can be used to write code and push it to th
 - Form generation
    - [x] Make it so that the part that asks about choosing other students shows their asurite, followed by their full name in each option.
    - [x] Create a way to generate the times and dates automatically
+
