@@ -213,8 +213,6 @@ const studentsHelper = {
       this.extractDataFromResponse(response, timeStrings);
     });
 
-    Logger.log(JSON.stringify(this.studentsObj, null, 2));
-
     return this.studentsObj;
   },
 

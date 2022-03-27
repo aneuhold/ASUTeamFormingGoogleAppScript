@@ -58,7 +58,7 @@ function addTestResponses() {
 }
 
 /**
- * Permanetly clears all responses from the attached form.
+ * Permanently clears all responses from the attached form.
  */
 function permanentlyClearResponses() {
   Form.permanentlyClearResponses();
