@@ -7,7 +7,7 @@
  */
 
 /**
- * Updates the form set in the config with the `formId` with the questions for
+ * Updates the form set in the config with the `formId`, with the questions for
  * each student.
  */
 function updateForm() {
