@@ -1,6 +1,4 @@
 /**
- * Changes here should be reflected in the `ConfigKey` type.
- *
  * @typedef ConfigObj
  * @type {{
  *  formTitle: string,
@@ -10,13 +8,6 @@
  *  numDislikedStudents: Number,
  *  proficiencyQuestions: string[]
  * }}
- */
-
-/**
- * Changes here should be reflected in the `ConfigObj` type.
- *
- * @typedef ConfigKey
- * @type {'formTitle' | 'formId' | 'formDescription'}
  */
 
 /**
@@ -51,7 +42,7 @@ const Config = {
    *
    * This only works for single cell configuration items.
    *
-   * @param {ConfigKey} configKey the config key name. For example `formId`.
+   * @param {keyof ConfigObj} configKey the config key name. For example `formId`.
    * @param {any} newValue the new value for the config item
    */
   setValue(configKey, newValue) {
@@ -97,6 +88,7 @@ const configHelper = {
 
     namedRanges.forEach((namedRange) => {
       const cellValue = namedRange.getRange().getValue();
+      /** @type {keyof ConfigObj} */
       const configKey = namedRange.getName();
 
       if (configKey === 'numPreferredStudents'

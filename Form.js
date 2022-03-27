@@ -32,6 +32,8 @@ const Form = {
    * in the form. These values are used for retrieval, storage, and processing,
    * but should not be manipulated.
    *
+   * Items in this context mean the different questions on the Google Form.
+   *
    * @type {{
    *  [itemName: string]: FormItemDetails
    * }}
@@ -269,8 +271,11 @@ const Form = {
   getItemsWithName(itemName) {
     const form = this.get();
     const itemIds = SpreadSheet.getFormItemIdWithName(itemName);
-    if (itemIds.length === 0) {
-      throw new Error(`No item ids found for ${itemName}`);
+
+    // If the lenght of the array is 0 or it just contains an empty string,
+    // then there are no questions in the form with that name.
+    if (itemIds.length === 0 || itemIds[0] === '') {
+      return [];
     }
     return itemIds.map((itemId) => form.getItemById(itemId));
   },
