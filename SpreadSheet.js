@@ -13,6 +13,19 @@
  */
 const SpreadSheet = {
   /**
+   * The color of a cell which indicates that data should be entered into it.
+   */
+  INFO_ENTRY_CELL_COLOR: '#fbbc04',
+
+  /**
+   * The color which indicates that the range is empty without actually deleting
+   * the range.
+   *
+   * This is red.
+   */
+  EMPTY_RANGE_COLOR: '#ff0000',
+
+  /**
    * Gets the Google Spreadsheet attached to this script.
    *
    * @returns {GoogleAppsScript.Spreadsheet.Spreadsheet} the Spreadsheet
@@ -118,40 +131,67 @@ const SpreadSheet = {
   },
 
   /**
-   * Adds a single row to the given named range.
+   * Adds a single cell to the given named range after the last one in the
+   * column.
    *
-   * @param {string} namedRangeName the name of the named range to add a row
+   * @param {string} namedRangeName the name of the named range to add a cell
    * after
    * @returns {void}
    */
-  addRowToNamedRange(namedRangeName) {
+  addCellToNamedRange(namedRangeName) {
     const namedRange = this.get().getRangeByName(namedRangeName);
     const sheet = namedRange.getSheet();
 
-    // Add a row after the last row in the named range
-    const lastRow = namedRange.getLastRow();
-    sheet.insertRowAfter(lastRow);
+    // If the range is already red (means empty), then just update the color
+    if (namedRange.getBackground() === this.EMPTY_RANGE_COLOR) {
+      namedRange.setBackground(this.INFO_ENTRY_CELL_COLOR);
+      return;
+    }
 
-    // Update the range so it includes the new row
+    // Update the range so it includes the new cell
     const newRange = sheet.getRange(namedRange.getRow(), namedRange.getColumn(),
       namedRange.getNumRows() + 1, namedRange.getNumColumns());
+
+    // Update the color
+    newRange.setBackground(this.INFO_ENTRY_CELL_COLOR);
 
     // Set the updated range to the named range
     this.get().setNamedRange(namedRangeName, newRange);
   },
 
   /**
-   * Removes a row from the given named range.
+   * Removes a cell from the given named range.
    *
-   * @param {string} namedRangeName the name of the range to remove a row from.
+   * If only one cell is left, it changes the background of the final cell to
+   * red.
+   *
+   * @param {string} namedRangeName the name of the range to remove a cell from.
    */
-  removeRowFromNamedRange(namedRangeName) {
+  removeCellFromNamedRange(namedRangeName) {
     const namedRange = this.get().getRangeByName(namedRangeName);
     const sheet = namedRange.getSheet();
 
-    // Remove the row
-    const lastRow = namedRange.getLastRow();
-    sheet.deleteRow(lastRow);
+    // If the background of the cell is already red, then don't do anything
+    if (namedRange.getBackground() === this.EMPTY_RANGE_COLOR) {
+      return;
+
+    // If there is only one cell left, then remove the text and change the
+    // background to red
+    } if (namedRange.getNumRows() === 1) {
+      namedRange.setValue('');
+      namedRange.setBackground(this.EMPTY_RANGE_COLOR);
+    } else {
+      // Reset the last cell in the named range
+      namedRange.getCell(namedRange.getNumRows(), namedRange.getNumColumns())
+        .setBackground('white').setValue('');
+
+      // Create a new range without the last cell
+      const newRange = sheet.getRange(namedRange.getRow(), namedRange.getColumn(),
+        namedRange.getNumRows() - 1, namedRange.getNumColumns());
+
+      // Set the updated range to the named range
+      this.get().setNamedRange(namedRangeName, newRange);
+    }
   },
 };
 

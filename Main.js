@@ -68,12 +68,12 @@ function permanentlyClearResponses() {
  * Adds a row to the proficiencyQuestions named range.
  */
 function addRowToProficiencyQuestions() {
-  SpreadSheet.addRowToNamedRange('proficiencyQuestions');
+  SpreadSheet.addCellToNamedRange('proficiencyQuestions');
 }
 
 /**
  * Removes a row from the proficiencyQuestions named range.
  */
 function removeRowFromProficiencyQuestions() {
-  SpreadSheet.removeRowFromNamedRange('proficiencyQuestions');
+  SpreadSheet.removeCellFromNamedRange('proficiencyQuestions');
 }
