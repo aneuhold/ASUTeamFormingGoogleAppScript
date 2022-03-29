@@ -18,7 +18,6 @@ Here is a [link to the folder with the Google Apps Scripts templates](https://dr
 ## Backlog
 
 - Group Forming
-  - [] When people do not fill out the survey, set it up so that they are added to the result sheet with no data
   - [x] Setup a way to compile the response data into a unified object
   - [x] Think of a way to format the data so that it will be easier to form students into groups
 - Testing
