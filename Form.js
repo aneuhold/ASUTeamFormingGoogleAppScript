@@ -32,6 +32,8 @@ const Form = {
    * in the form. These values are used for retrieval, storage, and processing,
    * but should not be manipulated.
    *
+   * Items in this context mean the different questions on the Google Form.
+   *
    * @type {{
    *  [itemName: string]: FormItemDetails
    * }}
@@ -269,8 +271,11 @@ const Form = {
   getItemsWithName(itemName) {
     const form = this.get();
     const itemIds = SpreadSheet.getFormItemIdWithName(itemName);
-    if (itemIds.length === 0) {
-      throw new Error(`No item ids found for ${itemName}`);
+
+    // If the lenght of the array is 0 or it just contains an empty string,
+    // then there are no questions in the form with that name.
+    if (itemIds.length === 0 || itemIds[0] === '') {
+      return [];
     }
     return itemIds.map((itemId) => form.getItemById(itemId));
   },
@@ -292,145 +297,209 @@ const formHelper = {
   /**
    * Adds the ASURITE ID question to the form.
    *
+   * If it already exists, the list of ASURITE IDs are updated.
+   *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addAsuriteQuestion(form) {
-    const listItem = form.addListItem()
-      .setTitle('Please select your ASURITE ID');
+    /** @type {GoogleAppsScript.Forms.ListItem} */
+    let listItem;
+
+    // If the question was already created, update the options
+    // otherwise, create the question
+    const currentItemId = SpreadSheet.getFormItemIdWithName('asuriteQuestion');
+    if (this.checkIfItemExists('asuriteQuestion', form)) {
+      listItem = form.getItemById(currentItemId).asListItem();
+      Logger.log('asuriteQuestion already exists, updating options...');
+    } else {
+      listItem = form.addListItem()
+        .setTitle('Please select your ASURITE ID');
+      SpreadSheet.addFormItemId('asuriteQuestion', listItem.getId());
+    }
+
     const choices = Students.getAsuriteIdsSorted();
     listItem.setChoiceValues(choices)
       .setRequired(true);
-
-    SpreadSheet.addFormItemId('asuriteQuestion', listItem.getId());
   },
 
   /**
-   * Adds the Github username question to the form.
+   * Adds the Github username question to the form if it doesn't already exist.
    *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addGithubUserNameQuestion(form) {
-    const textItem = form.addTextItem()
-      .setTitle('Please enter your Github username (NOT '
+    if (!this.checkIfItemExists('githubUsername', form)) {
+      const textItem = form.addTextItem()
+        .setTitle('Please enter your Github username (NOT '
       + 'your email address)')
-      .setRequired(true);
+        .setRequired(true);
 
-    SpreadSheet.addFormItemId('githubUsername', textItem.getId());
+      SpreadSheet.addFormItemId('githubUsername', textItem.getId());
+    }
   },
 
   /**
-   * Adds the Taiga email question to the form.
+   * Adds the Taiga email question to the form if it doesn't already exist.
    *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addTaigaEmailAddressQuestion(form) {
-    const textItem = form.addTextItem()
-      .setTitle('Email address for us to invite you to the '
+    if (!this.checkIfItemExists('taigaEmail', form)) {
+      const textItem = form.addTextItem()
+        .setTitle('Email address for us to invite you to the '
       + 'Taiga scrumboard')
-      .setRequired(true);
+        .setRequired(true);
 
-    const emailValidation = FormApp.createTextValidation()
-      .setHelpText('Text entered was not a valid email address')
-      .requireTextIsEmail()
-      .build();
+      const emailValidation = FormApp.createTextValidation()
+        .setHelpText('Text entered was not a valid email address')
+        .requireTextIsEmail()
+        .build();
 
-    textItem.setValidation(emailValidation);
-    SpreadSheet.addFormItemId('taigaEmail', textItem.getId());
+      textItem.setValidation(emailValidation);
+      SpreadSheet.addFormItemId('taigaEmail', textItem.getId());
+    }
   },
 
   /**
    * Adds the preferred students section which will populate with the number
    * of preferred students allowed as specified in the config.
    *
+   * If the questions were already created, it updates the list of options
+   * for the preferred team members.
+   *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
    */
   addPreferredStudentsSection(form) {
-    form.addPageBreakItem().setTitle('Preferred Teammates')
-      .setHelpText('Are there fellow students you would prefer to work'
+    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
+
+    if (!this.checkIfItemExists('preferredStudents', form)) {
+      form.addPageBreakItem().setTitle('Preferred Teammates')
+        .setHelpText('Are there fellow students you would prefer to work'
       + ' with?');
 
-    // Build the options for each one
-    const { numPreferredStudents } = Config.getObj();
-    const preferredStudentItemIds = [];
-    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
-    for (let i = 0; i < numPreferredStudents; i++) {
-      const listItem = form.addListItem()
-        .setTitle(`Preferred team member ${i + 1}`)
-        .setChoiceValues(asuriteNameComboStrings);
-      preferredStudentItemIds.push(listItem.getId());
+      // Build the options for each one
+      const { numPreferredStudents } = Config.getObj();
+      const preferredStudentItemIds = [];
+      for (let i = 0; i < numPreferredStudents; i++) {
+        const listItem = form.addListItem()
+          .setTitle(`Preferred team member ${i + 1}`)
+          .setChoiceValues(asuriteNameComboStrings);
+        preferredStudentItemIds.push(listItem.getId());
+      }
+      SpreadSheet.addFormItemId('preferredStudents', preferredStudentItemIds.join(';'));
+
+    // If the questions already exist
+    } else {
+      Logger.log('Preferred students section already exists. Updating ASUrite IDs...');
+      const formItemIds = SpreadSheet.getFormItemIdWithName('preferredStudents');
+      formItemIds.forEach((itemId) => {
+        form.getItemById(itemId).asListItem().setChoiceValues(asuriteNameComboStrings);
+      });
     }
-    SpreadSheet.addFormItemId('preferredStudents', preferredStudentItemIds.join(';'));
   },
 
   /**
    * Adds the disliked students section which will populate with the number
    * of disliked students allowed as specified in the config.
    *
+   * If the questions were already created, it updates the list of options
+   * for the non preferred team members.
+   *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the section to
    */
   addDislikedStudentsSection(form) {
-    form.addPageBreakItem().setTitle('Teammates NOT Preferred')
-      .setHelpText('Are there fellow students you would prefer NOT to work'
+    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
+
+    if (!this.checkIfItemExists('dislikedStudents', form)) {
+      form.addPageBreakItem().setTitle('Teammates NOT Preferred')
+        .setHelpText('Are there fellow students you would prefer NOT to work'
       + ' with?');
 
-    // Build the options for each one
-    const { numDislikedStudents } = Config.getObj();
-    const dislikedStudentItemIds = [];
-    const asuriteNameComboStrings = Students.getAsuriteNameCombos();
-    for (let i = 0; i < numDislikedStudents; i++) {
-      const listItem = form.addListItem()
-        .setTitle(`Non-preferred student ${i + 1}`)
-        .setChoiceValues(asuriteNameComboStrings);
-      dislikedStudentItemIds.push(listItem.getId());
+      // Build the options for each one
+      const { numDislikedStudents } = Config.getObj();
+      const dislikedStudentItemIds = [];
+      for (let i = 0; i < numDislikedStudents; i++) {
+        const listItem = form.addListItem()
+          .setTitle(`Non-preferred student ${i + 1}`)
+          .setChoiceValues(asuriteNameComboStrings);
+        dislikedStudentItemIds.push(listItem.getId());
+      }
+      SpreadSheet.addFormItemId('dislikedStudents', dislikedStudentItemIds.join(';'));
+
+    // If the questions already exist
+    } else {
+      Logger.log('Non-preferred students section already exists. Updating ASUrite IDs...');
+      const formItemIds = SpreadSheet.getFormItemIdWithName('dislikedStudents');
+      formItemIds.forEach((itemId) => {
+        form.getItemById(itemId).asListItem().setChoiceValues(asuriteNameComboStrings);
+      });
     }
-    SpreadSheet.addFormItemId('dislikedStudents', dislikedStudentItemIds.join(';'));
   },
 
   /**
-   * Adds the time zone question to the form.
+   * Adds the time zone question to the form if it wasn't already created.
    *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the question to
    */
   addTimeZonesQuestion(form) {
-    const listItem = form.addListItem()
-      .setTitle('In what time zone do you live or will you be during the'
+    if (!this.checkIfItemExists('timeZone', form)) {
+      const listItem = form.addListItem()
+        .setTitle('In what time zone do you live or will you be during the'
       + ' session? Please use UTC so we can match it easier.');
 
-    const choices = DateUtil.getUTCTimeZoneStrings();
+      const choices = DateUtil.getUTCTimeZoneStrings();
 
-    listItem.setChoiceValues(choices)
-      .setRequired(true);
-    SpreadSheet.addFormItemId('timeZone', listItem.getId());
+      listItem.setChoiceValues(choices)
+        .setRequired(true);
+      SpreadSheet.addFormItemId('timeZone', listItem.getId());
+    }
   },
 
   /**
-   * Adds the proficiency questions to the form as specified in the config.
+   * Adds the proficiency questions to the form as specified in the config if
+   * it wasn't already created.
    *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the questions to
    */
   addProficiencyQuestions(form) {
-    const { proficiencyQuestions } = Config.getObj();
-    const proficiencyItemIds = [];
-    proficiencyQuestions.forEach((question) => {
-      const scaleItem = form.addScaleItem()
-        .setTitle(question)
-        .setBounds(1, 5);
-      proficiencyItemIds.push(scaleItem.getId());
-    });
-    SpreadSheet.addFormItemId('proficiencyQuestions', proficiencyItemIds.join(';'));
+    if (!this.checkIfItemExists('proficiencyQuestions', form)) {
+      const { proficiencyQuestions } = Config.getObj();
+      const proficiencyItemIds = [];
+      proficiencyQuestions.forEach((question) => {
+        const scaleItem = form.addScaleItem()
+          .setTitle(question)
+          .setBounds(1, 5);
+        proficiencyItemIds.push(scaleItem.getId());
+      });
+      SpreadSheet.addFormItemId('proficiencyQuestions', proficiencyItemIds.join(';'));
+    }
   },
 
   /**
-   * Adds the availability grid to the form.
+   * Adds the availability grid to the form if it wasn't already created.
    *
    * @param {GoogleAppsScript.Forms.Form} form the form to add the questions to
    */
   addAvailabilityGrid(form) {
-    const checkboxItem = form.addCheckboxGridItem()
-      .setTitle('Please choose times that are good for your team to meet. '
+    if (!this.checkIfItemExists('availability', form)) {
+      const checkboxItem = form.addCheckboxGridItem()
+        .setTitle('Please choose times that are good for your team to meet. '
       + 'Times are in the Phoenix, AZ time zone!')
-      .setColumns(DateUtil.getWeekdayStrings())
-      .setRows(DateUtil.generateTimeStrings(3));
-    SpreadSheet.addFormItemId('availability', checkboxItem.getId());
+        .setColumns(DateUtil.getWeekdayStrings())
+        .setRows(DateUtil.generateTimeStrings(3));
+      SpreadSheet.addFormItemId('availability', checkboxItem.getId());
+    }
+  },
+
+  /**
+   * Checks if the given form item name (question name) already exists in the
+   * provided form.
+   *
+   * @param {string} formItemName
+   * @param {GoogleAppsScript.Forms.Form} form
+   */
+  checkIfItemExists(formItemName, form) {
+    const currentItemIds = SpreadSheet.getFormItemIdWithName(formItemName);
+    return currentItemIds && form.getItemById(currentItemIds[0]);
   },
 };

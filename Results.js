@@ -15,6 +15,8 @@ const Results = {
 };
 
 /**
+ * An object which holds information on a column in the results sheet.
+ *
  * @typedef ColumnObj
  * @type {{
  *  title: string,
@@ -24,6 +26,8 @@ const Results = {
  */
 
 /**
+ * The array of columns in the results sheet.
+ *
  * @typedef ColumnsArr
  * @type {ColumnObj[]}
  */
@@ -187,8 +191,8 @@ const resultsHelper = {
           sheet.getRange(studentIndex + 2, columnIndex + 1)
             .setValue(studentObj[studentObjKey]);
 
-        // The columnObj is part of the availability grid
-        } else if (studentObjKey === 'availability') {
+        // If the columnObj is part of the availability grid
+        } else if (studentObjKey === 'availability' && studentObj[studentObjKey][studentObjArrIndex]) {
           const currentWeekday = weekdays[currentWeekdayIndex];
           const available = studentObj[studentObjKey][studentObjArrIndex][currentWeekday];
           if (available) {

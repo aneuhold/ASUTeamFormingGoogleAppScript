@@ -200,8 +200,15 @@ const studentsHelper = {
 
     const form = Form.get();
     const responses = form.getResponses();
+    const formQuestions = form.getItems();
     this.studentsObj = studentsObj;
-    if (responses.length === 0) {
+
+    // If there are no responses or there are no questions on the Google Form,
+    // (a clear recently happened), then just return the students object as is.
+    //
+    // The comparison of 1 for the form questions is because the ASUrite ID
+    // question is added before reaching this point.
+    if (responses.length === 0 || formQuestions.length <= 1) {
       return this.studentsObj;
     }
 
@@ -212,8 +219,6 @@ const studentsHelper = {
     responses.forEach((response) => {
       this.extractDataFromResponse(response, timeStrings);
     });
-
-    Logger.log(JSON.stringify(this.studentsObj, null, 2));
 
     return this.studentsObj;
   },

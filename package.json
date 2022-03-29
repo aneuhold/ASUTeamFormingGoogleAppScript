@@ -4,6 +4,7 @@
   "description": "",
   "main": "Main.js",
   "dependencies": {
+    "@google/clasp": "^2.4.1",
     "@types/google-apps-script": "^1.0.17"
   },
   "devDependencies": {
@@ -12,7 +13,7 @@
     "eslint-plugin-import": "^2.22.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "push": "yarn clasp push"
   },
   "repository": {
     "type": "git",

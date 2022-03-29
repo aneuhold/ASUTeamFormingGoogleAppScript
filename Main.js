@@ -7,7 +7,7 @@
  */
 
 /**
- * Updates the form set in the config with the `formId` with the questions for
+ * Updates the form set in the config with the `formId`, with the questions for
  * each student.
  */
 function updateForm() {
@@ -58,7 +58,7 @@ function addTestResponses() {
 }
 
 /**
- * Permanetly clears all responses from the attached form.
+ * Permanently clears all responses from the attached form.
  */
 function permanentlyClearResponses() {
   Form.permanentlyClearResponses();
@@ -68,12 +68,12 @@ function permanentlyClearResponses() {
  * Adds a row to the proficiencyQuestions named range.
  */
 function addRowToProficiencyQuestions() {
-  SpreadSheet.addRowToNamedRange('proficiencyQuestions');
+  SpreadSheet.addCellToNamedRange('proficiencyQuestions');
 }
 
 /**
  * Removes a row from the proficiencyQuestions named range.
  */
 function removeRowFromProficiencyQuestions() {
-  SpreadSheet.removeRowFromNamedRange('proficiencyQuestions');
+  SpreadSheet.removeCellFromNamedRange('proficiencyQuestions');
 }
